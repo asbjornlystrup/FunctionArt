@@ -18,9 +18,12 @@ public class Main : MonoBehaviour {
         public Operator _operator; 
     }
 
-    struct Generation {
+    class Generation {
         public RenderTexture texture;
         public string text;
+        public ComputeBuffer programBuffer = null;
+        public int instructionCount;
+        public int memoryCellCountRequired;
     }
     
     public ComputeShader cs;
@@ -28,14 +31,14 @@ public class Main : MonoBehaviour {
     public Vector3Int threadGroups;
     public Vector3Int textureSize = new Vector3Int(256, 256, 1);
     public Texture2D cpuTexture;
-    public bool showCpuVersion = false;
+    private bool showCpuVersion = false;
+    private bool animate = true;
 
     private Texture2D cellBackgroundTexture;
-    private ComputeBuffer programBuffer = null;
     private uint nextOpenMemoryIndex = 0;
     private List<uint> programList = new List<uint>();
     private Generation[] generations;
-    private int generationsX = 5;
+    private int generationsX = 4;
     private int generationsY = 3;
 
     const uint XOR = 0;
@@ -47,6 +50,8 @@ public class Main : MonoBehaviour {
     const uint CONSTANT = 1000;
     const uint INPUT = 1001;
 
+    public int time = 0;
+
     void Awake() {
         cellBackgroundTexture = new Texture2D(1, 1);
         cellBackgroundTexture.SetPixel(0, 0, new Color(0, 0, 0, 1));
@@ -56,6 +61,7 @@ public class Main : MonoBehaviour {
         
         generations = new Generation[generationsX * generationsY];
         for (int i = 0; i < generations.Length; i++) {
+            generations[i] = new Generation();
             RenderTexture texture = new RenderTexture(textureSize.x, textureSize.y, 0, RenderTextureFormat.ARGB32);
             texture.enableRandomWrite = true;
             texture.Create();
@@ -69,102 +75,121 @@ public class Main : MonoBehaviour {
     }
 
     void Update() {
-        if (Input.GetMouseButtonDown(1))
-        for (int i = 0; i < generations.Length; i++) {
-            Debug.Log("Generation " + i);
+        bool updateTextures = false;
 
-            RenderTexture texture = generations[i].texture;
-            
-            Node rootNode = CreateAst(15);
-            generations[i].text = ComposeAstString(rootNode);
-            Debug.Log(generations[i].text);
+        if (Input.GetMouseButtonDown(1)) {
+            updateTextures = true;
+            time = 0;
+            for (int i = 0; i < generations.Length; i++) {
+                Generation generation = generations[i];
 
-            CreateProgram(rootNode);
+                Debug.Log("Generation " + i);
 
-            int kernelIndex = cs.FindKernel("Main");
-            cs.SetTexture(kernelIndex, "Texture", texture);
-            cs.SetBuffer(kernelIndex, "ProgramBuffer", programBuffer);
-            cs.SetInt("ProgramBufferElementCount", programBuffer.count);
-            cs.Dispatch(kernelIndex, threadGroups.x, threadGroups.y, threadGroups.z);
+                RenderTexture texture = generation.texture;
+                
+                Node rootNode = CreateAst(15);
+                generation.text = ComposeAstString(rootNode);
+                Debug.Log(generation.text);
 
-            if (showCpuVersion) {
-                uint CalculateNode(Node node, uint x, uint y, uint z) {
-                    if (node.type == NodeType.Operator) {
-                        switch (node._operator.type) {
-                            case XOR:
-                                return CalculateNode(node.children[0], x, y, z) ^ CalculateNode(node.children[1], x, y, z);
-                            case ADD:
-                                return CalculateNode(node.children[0], x, y, z) + CalculateNode(node.children[1], x, y, z);
-                            case MULTIPLY:
-                                return CalculateNode(node.children[0], x, y, z) * CalculateNode(node.children[1], x, y, z);
-                            case OR:
-                                return CalculateNode(node.children[0], x, y, z) | CalculateNode(node.children[1], x, y, z);
-                            case AND:
-                                return CalculateNode(node.children[0], x, y, z) & CalculateNode(node.children[1], x, y, z);
-                            case SUBTRACT:
-                                return CalculateNode(node.children[0], x, y, z) - CalculateNode(node.children[1], x, y, z);
-                            default:
-                                Debug.LogError("Unknown operator type");
+                {
+                    // v2: Instruction: ID, result memory index, value memory indices...
+                    // +: 0, r, x, y
+                    // input: 1, r, v
+                    // constant: 2, r, c
+                    programList.Clear();
+                    nextOpenMemoryIndex = 0;
+                    CompileNode(rootNode);
+                    //Debug.Log("Memory cells required: " + nextOpenMemoryIndex);
+                    //Debug.Log("Program instruction count: " + programList.Count);
+                    
+                    string s = "";
+                    for (int j = 0; j < programList.Count; j++) {
+                        s += programList[j] + ", ";
+                    }
+                    //Debug.Log("Instructions:" + s);
+
+                    int bytesPerElement = sizeof(uint);
+                    if (generation.programBuffer != null) generation.programBuffer.Release();
+                    generation.programBuffer = new ComputeBuffer(programList.Count, bytesPerElement, ComputeBufferType.Default);
+                    generation.programBuffer.SetData(programList.ToArray());
+                }
+
+                if (showCpuVersion) {
+                    uint CalculateNode(Node node, uint x, uint y, uint z) {
+                        if (node.type == NodeType.Operator) {
+                            switch (node._operator.type) {
+                                case XOR:
+                                    return CalculateNode(node.children[0], x, y, z) ^ CalculateNode(node.children[1], x, y, z);
+                                case ADD:
+                                    return CalculateNode(node.children[0], x, y, z) + CalculateNode(node.children[1], x, y, z);
+                                case MULTIPLY:
+                                    return CalculateNode(node.children[0], x, y, z) * CalculateNode(node.children[1], x, y, z);
+                                case OR:
+                                    return CalculateNode(node.children[0], x, y, z) | CalculateNode(node.children[1], x, y, z);
+                                case AND:
+                                    return CalculateNode(node.children[0], x, y, z) & CalculateNode(node.children[1], x, y, z);
+                                case SUBTRACT:
+                                    return CalculateNode(node.children[0], x, y, z) - CalculateNode(node.children[1], x, y, z);
+                                default:
+                                    Debug.LogError("Unknown operator type");
+                                    return 0;
+                            }
+                        } else if (node.type == NodeType.Constant) {
+                            return node.data;
+                        } else if (node.type == NodeType.Input) {
+                            if (node.data == 0) {
+                                return x;
+                            } else if (node.data == 1) {
+                                return y;
+                            } else if (node.data == 2) {
+                                return z;
+                            } else {
+                                Debug.LogError("Unknown input index");
                                 return 0;
-                        }
-                    } else if (node.type == NodeType.Constant) {
-                        return node.data;
-                    } else if (node.type == NodeType.Input) {
-                        if (node.data == 0) {
-                            return x;
-                        } else if (node.data == 1) {
-                            return y;
-                        } else if (node.data == 2) {
-                            return z;
+                            }
                         } else {
-                            Debug.LogError("Unknown input index");
+                            Debug.LogError("Unknown node type in calculateNode");
                             return 0;
                         }
-                    } else {
-                        Debug.LogError("Unknown node type in calculateNode");
-                        return 0;
                     }
-                }
 
-                for (uint y = 0; y < cpuTexture.height; y++) {
-                    for (uint x = 0; x < cpuTexture.width; x++) {
-                        float[] v = new float[3];
-                        for (uint z = 0; z < 3; z++) {
-                            v[z] = ((float)(CalculateNode(rootNode, x, y, z) % 256)) / 255f;
+                    for (uint y = 0; y < cpuTexture.height; y++) {
+                        for (uint x = 0; x < cpuTexture.width; x++) {
+                            float[] v = new float[3];
+                            for (uint z = 0; z < 3; z++) {
+                                v[z] = ((float)(CalculateNode(rootNode, x, y, z) % 256)) / 255f;
+                            }
+                            cpuTexture.SetPixel((int)x, (int)y, new Color(v[0], v[1], v[2], 1f));
                         }
-                        cpuTexture.SetPixel((int)x, (int)y, new Color(v[0], v[1], v[2], 1f));
                     }
+                    cpuTexture.Apply();
                 }
-                cpuTexture.Apply();
             }
         }
+
+        if (updateTextures || animate) {
+            foreach (Generation generation in generations) {
+                if (generation.programBuffer != null) {
+                    int kernelIndex = cs.FindKernel("Main");
+                    cs.SetTexture(kernelIndex, "Texture", generation.texture);
+                    cs.SetBuffer(kernelIndex, "ProgramBuffer", generation.programBuffer);
+                    cs.SetInt("ProgramBufferElementCount", generation.programBuffer.count);
+                    cs.SetInt("Time", time);
+                    cs.Dispatch(kernelIndex, threadGroups.x, threadGroups.y, threadGroups.z);
+                }
+            }
+            Debug.Log("Time: " + time);
+        } 
+    }
+
+    void FixedUpdate() {
+        time++;
     }
 
     void OnDestroy() {
-        programBuffer.Release();
-    }
-
-    void CreateProgram(Node rootNode) {
-        // v2: Instruction: ID, result memory index, value memory indices...
-        // +: 0, r, x, y
-        // input: 1, r, v
-        // constant: 2, r, c
-        programList.Clear();
-        nextOpenMemoryIndex = 0;
-        CompileNode(rootNode);
-        //Debug.Log("Memory cells required: " + nextOpenMemoryIndex);
-        //Debug.Log("Program instruction count: " + programList.Count);
-        
-        string s = "";
-        for (int i = 0; i < programList.Count; i++) {
-            s += programList[i] + ", ";
+        foreach (Generation g in generations) {
+            g.programBuffer.Release();
         }
-        //Debug.Log("Instructions:" + s);
-
-        int bytesPerElement = sizeof(uint);
-        if (programBuffer != null) programBuffer.Release();
-        programBuffer = new ComputeBuffer(programList.Count, bytesPerElement, ComputeBufferType.Default);
-        programBuffer.SetData(programList.ToArray());
     }
 
     uint CompileNode(Node node) {
@@ -202,12 +227,14 @@ public class Main : MonoBehaviour {
         int gap = 8;
         int i = 0;
         int outline = 2;
+        int totalWidth = gap + (textureSize.x + gap) * generationsX;
+        int totalHeight = gap + (textureSize.y + gap) * generationsY;
         for (int y = 0; y < generationsY; y++) {
             for (int x = 0; x < generationsX; x++) {
                 if (i < generations.Length) {
                     RenderTexture texture = generations[i].texture;
-                    int x1 = gap + x * (texture.width + gap);
-                    int y1 = gap + y * (texture.height + gap);
+                    int x1 = gap + x * (texture.width + gap) + (Screen.width / 2 - totalWidth / 2);
+                    int y1 = gap + y * (texture.height + gap) + (Screen.height / 2 - totalHeight / 2);
                     GUI.skin.box.normal.background = cellBackgroundTexture;
                     GUI.Box(new Rect(x1 - outline, y1 - outline, texture.width + outline * 2, texture.height + outline * 2), GUIContent.none);
                     GUI.DrawTexture(new Rect(x1, y1, texture.width, texture.height), texture);
@@ -230,7 +257,7 @@ public class Main : MonoBehaviour {
         operators.Add(new Operator {type = 3, inputCount = 2, formatString = "({0} | {1})"});
         operators.Add(new Operator {type = 4, inputCount = 2, formatString = "({0} & {1})"});
         operators.Add(new Operator {type = 5, inputCount = 2, formatString = "({0} - {1})"});
-        int inputCount = 3;
+        int inputCount = 4;
 
         Node root = null;
         

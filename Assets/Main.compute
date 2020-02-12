@@ -13,6 +13,7 @@ RWTexture2D<float4> Texture;
 
 StructuredBuffer<uint> ProgramBuffer;
 int ProgramBufferElementCount;
+int Time;
 
 [numthreads(8, 8, 1)]
 void Main (uint3 id : SV_DispatchThreadID) {
@@ -65,6 +66,7 @@ void Main (uint3 id : SV_DispatchThreadID) {
                         case 0: memory[memoryIndex] = id.x; break;
                         case 1: memory[memoryIndex] = id.y; break;
                         case 2: memory[memoryIndex] = c; break;
+                        case 3: memory[memoryIndex] = (uint)Time; break;
                         //case 2: memory[memoryIndex] = 
                     }
                     i += 3;
