@@ -1,0 +1,84 @@
+﻿#pragma kernel Main
+
+#define XOR 0
+#define ADD 1
+#define MULTIPLY 2
+#define OR 3
+#define AND 4
+#define SUBTRACT 5
+#define CONSTANT 1000
+#define INPUT 1001
+
+RWTexture2D<float4> Texture;
+
+StructuredBuffer<uint> ProgramBuffer;
+int ProgramBufferElementCount;
+
+[numthreads(8, 8, 1)]
+void Main (uint3 id : SV_DispatchThreadID) {
+    float4 color = float4(0.0, 0.0, 0.0, 1.0);
+    for (int c = 0; c < 3; c++) {
+        int i = 0;
+        uint memory[128];
+        uint memoryIndex;
+        while (i < ProgramBufferElementCount) {
+            uint instructionId = ProgramBuffer[i];
+            memoryIndex = ProgramBuffer[i + 1];
+            switch (instructionId) {
+                case XOR:
+                    memory[memoryIndex] = memory[ProgramBuffer[i + 2]] ^ memory[ProgramBuffer[i + 3]];
+                    i += 4;
+                    break;
+
+                case ADD:
+                    memory[memoryIndex] = memory[ProgramBuffer[i + 2]] + memory[ProgramBuffer[i + 3]];
+                    i += 4;
+                    break;
+
+                case MULTIPLY:
+                    memory[memoryIndex] = memory[ProgramBuffer[i + 2]] * memory[ProgramBuffer[i + 3]];
+                    i += 4;
+                    break;
+
+                case OR:
+                    memory[memoryIndex] = memory[ProgramBuffer[i + 2]] | memory[ProgramBuffer[i + 3]];
+                    i += 4;
+                    break;
+
+                case AND:
+                    memory[memoryIndex] = memory[ProgramBuffer[i + 2]] & memory[ProgramBuffer[i + 3]];
+                    i += 4;
+                    break;
+
+                case SUBTRACT:
+                    memory[memoryIndex] = memory[ProgramBuffer[i + 2]] - memory[ProgramBuffer[i + 3]];
+                    i += 4;
+                    break;
+                
+                case CONSTANT:
+                    memory[memoryIndex] = ProgramBuffer[i + 2];
+                    i += 3;
+                    break;
+
+                case INPUT:
+                    switch (ProgramBuffer[i + 2]) {
+                        case 0: memory[memoryIndex] = id.x; break;
+                        case 1: memory[memoryIndex] = id.y; break;
+                        case 2: memory[memoryIndex] = c; break;
+                        //case 2: memory[memoryIndex] = 
+                    }
+                    i += 3;
+                    break;
+            }
+        }
+
+        float result = float(memory[memoryIndex] % 256) / 255.0;
+        switch (c) {
+            case 0: color.x = result; break;
+            case 1: color.y = result; break;
+            case 2: color.z = result; break;
+        }
+    }
+
+    Texture[id.xy] = color;
+}
