@@ -1,7 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
 
 public class Main : MonoBehaviour {
     struct Operator {
@@ -142,19 +141,19 @@ public class Main : MonoBehaviour {
         {
             // Cool circular mixed with xy, lots of variation and curves
             {
-                operators.Add(new Operator {type = XOR, inputCount = 2, formatString = "({0} ^ {1})"});
-                operators.Add(new Operator {type = ADD, inputCount = 2, formatString = "({0} + {1})"});
-                operators.Add(new Operator {type = MULTIPLY, inputCount = 2, formatString = "({0} * {1})"});
-                operators.Add(new Operator {type = OR, inputCount = 2, formatString = "({0} | {1})"});
-                operators.Add(new Operator {type = AND, inputCount = 2, formatString = "({0} & {1})"});
-                operators.Add(new Operator {type = SUBTRACT, inputCount = 2, formatString = "({0} - {1})"});
+                // operators.Add(new Operator {type = XOR, inputCount = 2, formatString = "({0} ^ {1})"});
+                // operators.Add(new Operator {type = ADD, inputCount = 2, formatString = "({0} + {1})"});
+                // operators.Add(new Operator {type = MULTIPLY, inputCount = 2, formatString = "({0} * {1})"});
+                // operators.Add(new Operator {type = OR, inputCount = 2, formatString = "({0} | {1})"});
+                // operators.Add(new Operator {type = AND, inputCount = 2, formatString = "({0} & {1})"});
+                // operators.Add(new Operator {type = SUBTRACT, inputCount = 2, formatString = "({0} - {1})"});
 
-                inputValues.Add(new InputValue {type = INPUT_X, formatString = "x"});
-                inputValues.Add(new InputValue {type = INPUT_Y, formatString = "y"});
-                inputValues.Add(new InputValue {type = INPUT_CHANNEL, formatString = "c"});
-                inputValues.Add(new InputValue {type = INPUT_TIME, formatString = "t"});
-                inputValues.Add(new InputValue {type = INPUT_ANGLE, formatString = "ang"});
-                inputValues.Add(new InputValue {type = INPUT_LENGTH, formatString = "len"});
+                // inputValues.Add(new InputValue {type = INPUT_X, formatString = "x"});
+                // inputValues.Add(new InputValue {type = INPUT_Y, formatString = "y"});
+                // inputValues.Add(new InputValue {type = INPUT_CHANNEL, formatString = "c"});
+                // inputValues.Add(new InputValue {type = INPUT_TIME, formatString = "t"});
+                // inputValues.Add(new InputValue {type = INPUT_ANGLE, formatString = "ang"});
+                // inputValues.Add(new InputValue {type = INPUT_LENGTH, formatString = "len"});
             }
 
             operators.Add(new Operator {type = XOR, inputCount = 2, formatString = "({0} ^ {1})"});
