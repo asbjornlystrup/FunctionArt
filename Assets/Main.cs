@@ -222,6 +222,7 @@ public class Main : MonoBehaviour {
                 inputValues.Add(new InputValue {type = INPUT_CHANNEL, formatString = "c"});
                 inputValues.Add(new InputValue {type = INPUT_CHANNEL, formatString = "c"});
                 inputValues.Add(new InputValue {type = INPUT_TIME, formatString = "t"});
+                inputValues.Add(new InputValue {type = INPUT_TIME, formatString = "t"});
                 //inputValues.Add(new InputValue {type = INPUT_TIME, formatString = "t"});
                 // inputValues.Add(new InputValue {type = INPUT_ANGLE, formatString = "ang"});
                 // inputValues.Add(new InputValue {type = INPUT_LENGTH, formatString = "len"});
