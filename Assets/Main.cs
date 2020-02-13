@@ -140,48 +140,50 @@ public class Main : MonoBehaviour {
     void Awake() {
         {
             // Cool circular mixed with xy, lots of variation and curves
-            {
-                // operators.Add(new Operator {type = XOR, inputCount = 2, formatString = "({0} ^ {1})"});
-                // operators.Add(new Operator {type = ADD, inputCount = 2, formatString = "({0} + {1})"});
-                // operators.Add(new Operator {type = MULTIPLY, inputCount = 2, formatString = "({0} * {1})"});
-                // operators.Add(new Operator {type = OR, inputCount = 2, formatString = "({0} | {1})"});
-                // operators.Add(new Operator {type = AND, inputCount = 2, formatString = "({0} & {1})"});
-                // operators.Add(new Operator {type = SUBTRACT, inputCount = 2, formatString = "({0} - {1})"});
+            if (true) {
+                operators.Add(new Operator {type = XOR, inputCount = 2, formatString = "({0} ^ {1})"});
+                operators.Add(new Operator {type = ADD, inputCount = 2, formatString = "({0} + {1})"});
+                operators.Add(new Operator {type = MULTIPLY, inputCount = 2, formatString = "({0} * {1})"});
+                operators.Add(new Operator {type = OR, inputCount = 2, formatString = "({0} | {1})"});
+                operators.Add(new Operator {type = AND, inputCount = 2, formatString = "({0} & {1})"});
+                operators.Add(new Operator {type = SUBTRACT, inputCount = 2, formatString = "({0} - {1})"});
 
-                // inputValues.Add(new InputValue {type = INPUT_X, formatString = "x"});
-                // inputValues.Add(new InputValue {type = INPUT_Y, formatString = "y"});
-                // inputValues.Add(new InputValue {type = INPUT_CHANNEL, formatString = "c"});
-                // inputValues.Add(new InputValue {type = INPUT_TIME, formatString = "t"});
-                // inputValues.Add(new InputValue {type = INPUT_ANGLE, formatString = "ang"});
-                // inputValues.Add(new InputValue {type = INPUT_LENGTH, formatString = "len"});
+                inputValues.Add(new InputValue {type = INPUT_X, formatString = "x"});
+                inputValues.Add(new InputValue {type = INPUT_Y, formatString = "y"});
+                inputValues.Add(new InputValue {type = INPUT_CHANNEL, formatString = "c"});
+                inputValues.Add(new InputValue {type = INPUT_TIME, formatString = "t"});
+                inputValues.Add(new InputValue {type = INPUT_ANGLE, formatString = "ang"});
+                inputValues.Add(new InputValue {type = INPUT_LENGTH, formatString = "len"});
             }
 
-            operators.Add(new Operator {type = XOR, inputCount = 2, formatString = "({0} ^ {1})"});
-            operators.Add(new Operator {type = ADD, inputCount = 2, formatString = "({0} + {1})"});
-            operators.Add(new Operator {type = MULTIPLY, inputCount = 2, formatString = "({0} * {1})"});
-            operators.Add(new Operator {type = SQRT, inputCount = 1, formatString = "({0} ** 0.5)"});
-            operators.Add(new Operator {type = SQRT, inputCount = 1, formatString = "({0} ** 0.5)"});
-            operators.Add(new Operator {type = OR, inputCount = 2, formatString = "({0} | {1})"});
-            operators.Add(new Operator {type = AND, inputCount = 2, formatString = "({0} & {1})"});
-            operators.Add(new Operator {type = SUBTRACT, inputCount = 2, formatString = "({0} - {1})"});
-            operators.Add(new Operator {type = INPUT_TEXTURE_DISTORT, inputCount = 3, formatString = "sample({0}, {1})"});
-            operators.Add(new Operator {type = INPUT_TEXTURE_DISTORT, inputCount = 3, formatString = "sample({0}, {1})"});
-            operators.Add(new Operator {type = INPUT_TEXTURE_DISTORT, inputCount = 3, formatString = "sample({0}, {1})"});
-            operators.Add(new Operator {type = SINE, inputCount = 1, formatString = "sin({0})"});
-            operators.Add(new Operator {type = TAN, inputCount = 1, formatString = "tan({0})"});
-            operators.Add(new Operator {type = SINE, inputCount = 1, formatString = "sin({0})"});
-            operators.Add(new Operator {type = TAN, inputCount = 1, formatString = "tan({0})"});
+            if (false) {
+                operators.Add(new Operator {type = XOR, inputCount = 2, formatString = "({0} ^ {1})"});
+                operators.Add(new Operator {type = ADD, inputCount = 2, formatString = "({0} + {1})"});
+                operators.Add(new Operator {type = MULTIPLY, inputCount = 2, formatString = "({0} * {1})"});
+                //operators.Add(new Operator {type = SQRT, inputCount = 1, formatString = "({0} ** 0.5)"});
+                // operators.Add(new Operator {type = SQRT, inputCount = 1, formatString = "({0} ** 0.5)"});
+                operators.Add(new Operator {type = OR, inputCount = 2, formatString = "({0} | {1})"});
+                operators.Add(new Operator {type = AND, inputCount = 2, formatString = "({0} & {1})"});
+                operators.Add(new Operator {type = SUBTRACT, inputCount = 2, formatString = "({0} - {1})"});
+                // operators.Add(new Operator {type = INPUT_TEXTURE_DISTORT, inputCount = 3, formatString = "sample({0}, {1})"});
+                // operators.Add(new Operator {type = INPUT_TEXTURE_DISTORT, inputCount = 3, formatString = "sample({0}, {1})"});
+                // operators.Add(new Operator {type = INPUT_TEXTURE_DISTORT, inputCount = 3, formatString = "sample({0}, {1})"});
+                // operators.Add(new Operator {type = SINE, inputCount = 1, formatString = "sin({0})"});
+                // operators.Add(new Operator {type = TAN, inputCount = 1, formatString = "tan({0})"});
+                // operators.Add(new Operator {type = SINE, inputCount = 1, formatString = "sin({0})"});
+                // operators.Add(new Operator {type = TAN, inputCount = 1, formatString = "tan({0})"});
 
-            inputValues.Add(new InputValue {type = INPUT_X, formatString = "x"});
-            inputValues.Add(new InputValue {type = INPUT_Y, formatString = "y"});
-            inputValues.Add(new InputValue {type = INPUT_CHANNEL, formatString = "c"});
-            inputValues.Add(new InputValue {type = INPUT_CHANNEL, formatString = "c"});
-            inputValues.Add(new InputValue {type = INPUT_TIME, formatString = "t"});
-            inputValues.Add(new InputValue {type = INPUT_ANGLE, formatString = "ang"});
-            inputValues.Add(new InputValue {type = INPUT_LENGTH, formatString = "len"});
-            inputValues.Add(new InputValue {type = INPUT_TEXTURE_RGB, formatString = "rgb"});
-            inputValues.Add(new InputValue {type = INPUT_TEXTURE_RGB, formatString = "rgb"});
-            inputValues.Add(new InputValue {type = INPUT_TEXTURE_RGB, formatString = "rgb"});
+                inputValues.Add(new InputValue {type = INPUT_X, formatString = "x"});
+                inputValues.Add(new InputValue {type = INPUT_Y, formatString = "y"});
+                inputValues.Add(new InputValue {type = INPUT_CHANNEL, formatString = "c"});
+                // inputValues.Add(new InputValue {type = INPUT_CHANNEL, formatString = "c"});
+                inputValues.Add(new InputValue {type = INPUT_TIME, formatString = "t"});
+                inputValues.Add(new InputValue {type = INPUT_ANGLE, formatString = "ang"});
+                inputValues.Add(new InputValue {type = INPUT_LENGTH, formatString = "len"});
+                // inputValues.Add(new InputValue {type = INPUT_TEXTURE_RGB, formatString = "rgb"});
+                // inputValues.Add(new InputValue {type = INPUT_TEXTURE_RGB, formatString = "rgb"});
+                // inputValues.Add(new InputValue {type = INPUT_TEXTURE_RGB, formatString = "rgb"});
+            }
         }
 
         cellBackgroundTexture = new Texture2D(1, 1);
@@ -218,7 +220,7 @@ public class Main : MonoBehaviour {
 
                 RenderTexture texture = generation.texture;
                 
-                Node rootNode = CreateAst(15);
+                Node rootNode = CreateAst(10);
                 generation.text = ComposeAstString(rootNode);
                 Debug.Log(generation.text);
 
