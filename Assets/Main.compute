@@ -6,6 +6,10 @@
 #define OR 3
 #define AND 4
 #define SUBTRACT 5
+#define SINE 6
+#define TAN 7
+#define SQRT 8
+
 #define CONSTANT 1000
 #define INPUT_X 1001
 #define INPUT_Y 1002
@@ -14,6 +18,7 @@
 #define INPUT_ANGLE 1005
 #define INPUT_LENGTH 1006
 #define INPUT_TEXTURE_RGB 1007
+#define INPUT_TEXTURE_DISTORT 1008
 
 RWTexture2D<float4> Texture;
 Texture2D<float4> InputTexture;
@@ -46,7 +51,12 @@ void Main (uint3 id : SV_DispatchThreadID) {
                 case OR: r = memory[ProgramBuffer[i + 2]] | memory[ProgramBuffer[i + 3]]; i += 4; break;
                 case AND: r = memory[ProgramBuffer[i + 2]] & memory[ProgramBuffer[i + 3]]; i += 4; break;
                 case SUBTRACT: r = memory[ProgramBuffer[i + 2]] - memory[ProgramBuffer[i + 3]]; i += 4; break;
+                case SINE: r = uint((sin(float(memory[ProgramBuffer[i + 2]] % 25600) / float(2560.0) * 6.28) * 0.5 + 0.5) * 0xFFFFFFFF); i += 3; break;
+                case TAN: r = uint((tan(float(memory[ProgramBuffer[i + 2]] % 25600) / float(2560.0) * 6.28) * 0.5 + 0.5) * 0xFFFFFFFF); i += 3; break;
+                case SQRT: r = uint(sqrt((float)memory[ProgramBuffer[i + 2]])); i += 3; break;
+
                 case CONSTANT: r = ProgramBuffer[i + 2]; i += 3; break;
+
                 case INPUT_X: r = id.x; i += 2; break;
                 case INPUT_Y: r = id.y; i += 2; break;
                 case INPUT_CHANNEL: r = c; i += 2; break;
@@ -60,6 +70,15 @@ void Main (uint3 id : SV_DispatchThreadID) {
                         case 2: r = inputColor.b; break;
                     }
                     i += 2;
+                    break;
+                case INPUT_TEXTURE_DISTORT:
+                    uint4 distortedColor = uint4(InputTexture[uint2(id.x + memory[ProgramBuffer[i + 2]] % 256, id.y + memory[ProgramBuffer[i + 3]] % 256)] * 255.0);
+                    switch ((c + memory[ProgramBuffer[i + 4]]) % 3) {
+                        case 0: r = distortedColor.r; break;
+                        case 1: r = distortedColor.g; break;
+                        case 2: r = distortedColor.b; break;
+                    }
+                    i += 5;
                     break;
             }
             memory[memoryIndex] = r;

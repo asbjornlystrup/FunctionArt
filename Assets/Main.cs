@@ -29,8 +29,6 @@ public class Main : MonoBehaviour {
         public RenderTexture texture;
         public string text;
         public ComputeBuffer programBuffer = null;
-        public int instructionCount;
-        public int memoryCellCountRequired;
     }
     
     public ComputeShader cs;
@@ -55,6 +53,10 @@ public class Main : MonoBehaviour {
     const uint OR = 3;
     const uint AND = 4;
     const uint SUBTRACT = 5;
+    const uint SINE = 6;
+    const uint TAN = 7;
+    const uint SQRT = 8;
+
     const uint CONSTANT = 1000;
     const uint INPUT_X = 1001;
     const uint INPUT_Y = 1002;
@@ -63,6 +65,7 @@ public class Main : MonoBehaviour {
     const uint INPUT_ANGLE = 1005;
     const uint INPUT_LENGTH = 1006;
     const uint INPUT_TEXTURE_RGB = 1007;
+    const uint INPUT_TEXTURE_DISTORT = 1008;
 
     public int time = 0;
 
@@ -157,18 +160,28 @@ public class Main : MonoBehaviour {
             operators.Add(new Operator {type = XOR, inputCount = 2, formatString = "({0} ^ {1})"});
             operators.Add(new Operator {type = ADD, inputCount = 2, formatString = "({0} + {1})"});
             operators.Add(new Operator {type = MULTIPLY, inputCount = 2, formatString = "({0} * {1})"});
+            operators.Add(new Operator {type = SQRT, inputCount = 1, formatString = "({0} ** 0.5)"});
+            operators.Add(new Operator {type = SQRT, inputCount = 1, formatString = "({0} ** 0.5)"});
             operators.Add(new Operator {type = OR, inputCount = 2, formatString = "({0} | {1})"});
             operators.Add(new Operator {type = AND, inputCount = 2, formatString = "({0} & {1})"});
             operators.Add(new Operator {type = SUBTRACT, inputCount = 2, formatString = "({0} - {1})"});
+            operators.Add(new Operator {type = INPUT_TEXTURE_DISTORT, inputCount = 3, formatString = "sample({0}, {1})"});
+            operators.Add(new Operator {type = INPUT_TEXTURE_DISTORT, inputCount = 3, formatString = "sample({0}, {1})"});
+            operators.Add(new Operator {type = INPUT_TEXTURE_DISTORT, inputCount = 3, formatString = "sample({0}, {1})"});
+            operators.Add(new Operator {type = SINE, inputCount = 1, formatString = "sin({0})"});
+            operators.Add(new Operator {type = TAN, inputCount = 1, formatString = "tan({0})"});
+            operators.Add(new Operator {type = SINE, inputCount = 1, formatString = "sin({0})"});
+            operators.Add(new Operator {type = TAN, inputCount = 1, formatString = "tan({0})"});
 
             inputValues.Add(new InputValue {type = INPUT_X, formatString = "x"});
             inputValues.Add(new InputValue {type = INPUT_Y, formatString = "y"});
             inputValues.Add(new InputValue {type = INPUT_CHANNEL, formatString = "c"});
             inputValues.Add(new InputValue {type = INPUT_CHANNEL, formatString = "c"});
-            inputValues.Add(new InputValue {type = INPUT_CHANNEL, formatString = "c"});
             inputValues.Add(new InputValue {type = INPUT_TIME, formatString = "t"});
             inputValues.Add(new InputValue {type = INPUT_ANGLE, formatString = "ang"});
             inputValues.Add(new InputValue {type = INPUT_LENGTH, formatString = "len"});
+            inputValues.Add(new InputValue {type = INPUT_TEXTURE_RGB, formatString = "rgb"});
+            inputValues.Add(new InputValue {type = INPUT_TEXTURE_RGB, formatString = "rgb"});
             inputValues.Add(new InputValue {type = INPUT_TEXTURE_RGB, formatString = "rgb"});
         }
 
