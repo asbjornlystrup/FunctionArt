@@ -220,8 +220,9 @@ public class Main : MonoBehaviour {
                 inputValues.Add(new InputValue {type = INPUT_CHANNEL, formatString = "c"});
                 inputValues.Add(new InputValue {type = INPUT_CHANNEL, formatString = "c"});
                 inputValues.Add(new InputValue {type = INPUT_CHANNEL, formatString = "c"});
+                inputValues.Add(new InputValue {type = INPUT_CHANNEL, formatString = "c"});
                 inputValues.Add(new InputValue {type = INPUT_TIME, formatString = "t"});
-                inputValues.Add(new InputValue {type = INPUT_TIME, formatString = "t"});
+                //inputValues.Add(new InputValue {type = INPUT_TIME, formatString = "t"});
                 // inputValues.Add(new InputValue {type = INPUT_ANGLE, formatString = "ang"});
                 // inputValues.Add(new InputValue {type = INPUT_LENGTH, formatString = "len"});
 
@@ -286,7 +287,7 @@ public class Main : MonoBehaviour {
     void Update() {
         bool updateTextures = false;
 
-        if (Input.GetMouseButtonDown(0) || Input.GetMouseButtonDown(1)) {
+        if (Input.GetKeyDown(KeyCode.Space) || Input.GetMouseButtonDown(0) || Input.GetMouseButtonDown(1)) {
             updateTextures = true;
             time = 0;
             for (int i = 0; i < generations.Length; i++) {
@@ -296,7 +297,7 @@ public class Main : MonoBehaviour {
 
                 RenderTexture texture = generation.texture;
                 
-                Node rootNode = CreateAst(15);
+                Node rootNode = CreateAst(10);
                 generation.text = ComposeAstString(rootNode);
                 Debug.Log(generation.text);
 
