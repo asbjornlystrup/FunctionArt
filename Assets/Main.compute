@@ -9,6 +9,9 @@
 #define SINE 6
 #define TAN 7
 #define SQRT 8
+#define ANGLE_DISTORT 9
+#define LENGTH_DISTORT 10
+#define INPUT_TEXTURE_DISTORT 11
 
 #define CONSTANT 1000
 #define INPUT_X 1001
@@ -18,7 +21,6 @@
 #define INPUT_ANGLE 1005
 #define INPUT_LENGTH 1006
 #define INPUT_TEXTURE_RGB 1007
-#define INPUT_TEXTURE_DISTORT 1008
 
 RWTexture2D<float4> Texture;
 Texture2D<float4> InputTexture;
@@ -30,7 +32,7 @@ int Time;
 [numthreads(8, 8, 1)]
 void Main (uint3 id : SV_DispatchThreadID) {
     float2 centerToPos = id.xy - float2(128, 128);
-    uint ang = (uint)(atan2(centerToPos.y, centerToPos.x) / 6.28 * 256.0);
+    uint ang = (uint)((atan2(centerToPos.y, centerToPos.x) + 3.14) / 6.28 * 256.0);
     uint len = (uint)(length(centerToPos));
 
     uint4 inputColor = (uint)(InputTexture[id.xy] * 255.0);
@@ -54,6 +56,25 @@ void Main (uint3 id : SV_DispatchThreadID) {
                 case SINE: r = uint((sin(float(memory[ProgramBuffer[i + 2]] % 25600) / float(2560.0) * 6.28) * 0.5 + 0.5) * 0xFFFFFFFF); i += 3; break;
                 case TAN: r = uint((tan(float(memory[ProgramBuffer[i + 2]] % 25600) / float(2560.0) * 6.28) * 0.5 + 0.5) * 0xFFFFFFFF); i += 3; break;
                 case SQRT: r = uint(sqrt((float)memory[ProgramBuffer[i + 2]])); i += 3; break;
+                case ANGLE_DISTORT:
+                    float2 centerToPosExt = id.xy - float2(memory[ProgramBuffer[i + 2]] % 256, memory[ProgramBuffer[i + 3]] % 256);
+                    r = (uint)((atan2(centerToPosExt.y, centerToPosExt.x) + 3.14) / 6.28 * 256.0);
+                    i += 4;
+                    break;
+                case LENGTH_DISTORT:
+                    float2 centerToPosExt2 = id.xy - float2(memory[ProgramBuffer[i + 2]] % 256, memory[ProgramBuffer[i + 3]] % 256);
+                    r = (uint)(length(uint2(centerToPosExt2)));
+                    i += 4;
+                    break;
+                case INPUT_TEXTURE_DISTORT:
+                    uint4 distortedColor = uint4(InputTexture[uint2(id.x + memory[ProgramBuffer[i + 2]] % 256, id.y + memory[ProgramBuffer[i + 3]] % 256)] * 255.0);
+                    switch ((c + memory[ProgramBuffer[i + 4]]) % 3) {
+                        case 0: r = distortedColor.r; break;
+                        case 1: r = distortedColor.g; break;
+                        case 2: r = distortedColor.b; break;
+                    }
+                    i += 5;
+                    break;
 
                 case CONSTANT: r = ProgramBuffer[i + 2]; i += 3; break;
 
@@ -70,15 +91,6 @@ void Main (uint3 id : SV_DispatchThreadID) {
                         case 2: r = inputColor.b; break;
                     }
                     i += 2;
-                    break;
-                case INPUT_TEXTURE_DISTORT:
-                    uint4 distortedColor = uint4(InputTexture[uint2(id.x + memory[ProgramBuffer[i + 2]] % 256, id.y + memory[ProgramBuffer[i + 3]] % 256)] * 255.0);
-                    switch ((c + memory[ProgramBuffer[i + 4]]) % 3) {
-                        case 0: r = distortedColor.r; break;
-                        case 1: r = distortedColor.g; break;
-                        case 2: r = distortedColor.b; break;
-                    }
-                    i += 5;
                     break;
             }
             memory[memoryIndex] = r;

@@ -38,6 +38,7 @@ public class Main : MonoBehaviour {
     public Texture2D inputTexture;
     private bool showCpuVersion = false;
     private bool animate = true;
+    private bool videoMode = true;
 
     private Texture2D cellBackgroundTexture;
     private uint nextOpenMemoryIndex = 0;
@@ -55,6 +56,9 @@ public class Main : MonoBehaviour {
     const uint SINE = 6;
     const uint TAN = 7;
     const uint SQRT = 8;
+    const uint ANGLE_DISTORT = 9;
+    const uint LENGTH_DISTORT = 10;
+    const uint INPUT_TEXTURE_DISTORT = 11;
 
     const uint CONSTANT = 1000;
     const uint INPUT_X = 1001;
@@ -64,7 +68,6 @@ public class Main : MonoBehaviour {
     const uint INPUT_ANGLE = 1005;
     const uint INPUT_LENGTH = 1006;
     const uint INPUT_TEXTURE_RGB = 1007;
-    const uint INPUT_TEXTURE_DISTORT = 1008;
 
     public int time = 0;
 
@@ -138,9 +141,14 @@ public class Main : MonoBehaviour {
     }
 
     void Awake() {
+        if (videoMode) {
+            generationsX = 7;
+            generationsY = 4;
+        }
+        
         {
             // Cool circular mixed with xy, lots of variation and curves
-            if (true) {
+            if (false) {
                 operators.Add(new Operator {type = XOR, inputCount = 2, formatString = "({0} ^ {1})"});
                 operators.Add(new Operator {type = ADD, inputCount = 2, formatString = "({0} + {1})"});
                 operators.Add(new Operator {type = MULTIPLY, inputCount = 2, formatString = "({0} * {1})"});
@@ -155,6 +163,74 @@ public class Main : MonoBehaviour {
                 inputValues.Add(new InputValue {type = INPUT_ANGLE, formatString = "ang"});
                 inputValues.Add(new InputValue {type = INPUT_LENGTH, formatString = "len"});
             }
+
+            // More colorful "Cool circular mixed with xy, lots of variation and curves"
+            if (false) {
+                operators.Add(new Operator {type = XOR, inputCount = 2, formatString = "({0} ^ {1})"});
+                operators.Add(new Operator {type = ADD, inputCount = 2, formatString = "({0} + {1})"});
+                operators.Add(new Operator {type = MULTIPLY, inputCount = 2, formatString = "({0} * {1})"});
+                operators.Add(new Operator {type = OR, inputCount = 2, formatString = "({0} | {1})"});
+                operators.Add(new Operator {type = AND, inputCount = 2, formatString = "({0} & {1})"});
+                operators.Add(new Operator {type = SUBTRACT, inputCount = 2, formatString = "({0} - {1})"});
+
+                inputValues.Add(new InputValue {type = INPUT_X, formatString = "x"});
+                inputValues.Add(new InputValue {type = INPUT_Y, formatString = "y"});
+                inputValues.Add(new InputValue {type = INPUT_CHANNEL, formatString = "c"});
+                inputValues.Add(new InputValue {type = INPUT_CHANNEL, formatString = "c"});
+                inputValues.Add(new InputValue {type = INPUT_CHANNEL, formatString = "c"});
+                inputValues.Add(new InputValue {type = INPUT_TIME, formatString = "t"});
+                inputValues.Add(new InputValue {type = INPUT_TIME, formatString = "t"});
+                inputValues.Add(new InputValue {type = INPUT_ANGLE, formatString = "ang"});
+                inputValues.Add(new InputValue {type = INPUT_LENGTH, formatString = "len"});
+            }
+
+            // With distorted polar coordinates only. Lots of organic stuff.
+            if (false) {
+                operators.Add(new Operator {type = XOR, inputCount = 2, formatString = "({0} ^ {1})"});
+                operators.Add(new Operator {type = ADD, inputCount = 2, formatString = "({0} + {1})"});
+                operators.Add(new Operator {type = MULTIPLY, inputCount = 2, formatString = "({0} * {1})"});
+                operators.Add(new Operator {type = OR, inputCount = 2, formatString = "({0} | {1})"});
+                operators.Add(new Operator {type = AND, inputCount = 2, formatString = "({0} & {1})"});
+                operators.Add(new Operator {type = SUBTRACT, inputCount = 2, formatString = "({0} - {1})"});
+                operators.Add(new Operator {type = ANGLE_DISTORT, inputCount = 2, formatString = "angExt({0}, {1})"});
+                operators.Add(new Operator {type = LENGTH_DISTORT, inputCount = 2, formatString = "lenExt({0}, {1})"});
+
+                inputValues.Add(new InputValue {type = INPUT_CHANNEL, formatString = "c"});
+                inputValues.Add(new InputValue {type = INPUT_TIME, formatString = "t"});
+
+                // operators.Add(new Operator {type = INPUT_TEXTURE_DISTORT, inputCount = 3, formatString = "sample({0}, {1})"});
+                // operators.Add(new Operator {type = INPUT_TEXTURE_DISTORT, inputCount = 3, formatString = "sample({0}, {1})"});
+                // inputValues.Add(new InputValue {type = INPUT_TEXTURE_RGB, formatString = "rgb"});
+                // inputValues.Add(new InputValue {type = INPUT_TEXTURE_RGB, formatString = "rgb"});
+            }
+
+            // With distorted polar coordinates and other older input coordinates
+            if (true) {
+                operators.Add(new Operator {type = XOR, inputCount = 2, formatString = "({0} ^ {1})"});
+                operators.Add(new Operator {type = ADD, inputCount = 2, formatString = "({0} + {1})"});
+                operators.Add(new Operator {type = MULTIPLY, inputCount = 2, formatString = "({0} * {1})"});
+                operators.Add(new Operator {type = OR, inputCount = 2, formatString = "({0} | {1})"});
+                operators.Add(new Operator {type = AND, inputCount = 2, formatString = "({0} & {1})"});
+                operators.Add(new Operator {type = SUBTRACT, inputCount = 2, formatString = "({0} - {1})"});
+                operators.Add(new Operator {type = ANGLE_DISTORT, inputCount = 2, formatString = "angExt({0}, {1})"});
+                operators.Add(new Operator {type = LENGTH_DISTORT, inputCount = 2, formatString = "lenExt({0}, {1})"});
+
+                inputValues.Add(new InputValue {type = INPUT_X, formatString = "x"});
+                inputValues.Add(new InputValue {type = INPUT_Y, formatString = "y"});
+                inputValues.Add(new InputValue {type = INPUT_CHANNEL, formatString = "c"});
+                inputValues.Add(new InputValue {type = INPUT_CHANNEL, formatString = "c"});
+                inputValues.Add(new InputValue {type = INPUT_CHANNEL, formatString = "c"});
+                inputValues.Add(new InputValue {type = INPUT_TIME, formatString = "t"});
+                inputValues.Add(new InputValue {type = INPUT_TIME, formatString = "t"});
+                // inputValues.Add(new InputValue {type = INPUT_ANGLE, formatString = "ang"});
+                // inputValues.Add(new InputValue {type = INPUT_LENGTH, formatString = "len"});
+
+                // operators.Add(new Operator {type = INPUT_TEXTURE_DISTORT, inputCount = 3, formatString = "sample({0}, {1})"});
+                // operators.Add(new Operator {type = INPUT_TEXTURE_DISTORT, inputCount = 3, formatString = "sample({0}, {1})"});
+                // inputValues.Add(new InputValue {type = INPUT_TEXTURE_RGB, formatString = "rgb"});
+                // inputValues.Add(new InputValue {type = INPUT_TEXTURE_RGB, formatString = "rgb"});
+            }
+
 
             if (false) {
                 operators.Add(new Operator {type = XOR, inputCount = 2, formatString = "({0} ^ {1})"});
@@ -220,7 +296,7 @@ public class Main : MonoBehaviour {
 
                 RenderTexture texture = generation.texture;
                 
-                Node rootNode = CreateAst(10);
+                Node rootNode = CreateAst(15);
                 generation.text = ComposeAstString(rootNode);
                 Debug.Log(generation.text);
 
@@ -377,32 +453,34 @@ public class Main : MonoBehaviour {
             }
         }
 
-        float textAreaWidth = Screen.width / 2 - totalWidth / 2 - gap - gap;
-        float textAreaHeight = Screen.height - gap * 2;
+        if (!videoMode) {
+            float textAreaWidth = Screen.width / 2 - totalWidth / 2 - gap - gap;
+            float textAreaHeight = Screen.height - gap * 2;
 
-        GUI.skin.textArea.focused.background = null;
-        GUI.skin.textArea.hover.background = null;
+            GUI.skin.textArea.focused.background = null;
+            GUI.skin.textArea.hover.background = null;
 
-        GUI.skin.textArea.alignment = TextAnchor.UpperLeft;
-        GUI.skin.textArea.normal.background = null;
-        GUI.skin.textArea.normal.textColor = new Color(0f, 0f, 0f, 0.4f);
-        GUI.TextArea(new Rect(gap, gap, textAreaWidth, textAreaHeight), s);
-        
-        s = "Operators:\n";
-        foreach (Operator _operator in operators) {
-            s += _operator.formatString + "\n";
-        }
-        s += "\nInputs:\n";
-        foreach (InputValue inputValue in inputValues) {
-            s += inputValue.formatString + "\n";
-        }
-        GUI.skin.textArea.normal.background = null;
-        GUI.skin.textArea.normal.textColor = new Color(0f, 0f, 0f, 0.4f);
-        GUI.skin.textArea.alignment = TextAnchor.UpperRight;
-        GUI.TextArea(new Rect(Screen.width - 1 - gap - textAreaWidth, gap, textAreaWidth, textAreaHeight), s);
+            GUI.skin.textArea.alignment = TextAnchor.UpperLeft;
+            GUI.skin.textArea.normal.background = null;
+            GUI.skin.textArea.normal.textColor = new Color(0f, 0f, 0f, 0.4f);
+            GUI.TextArea(new Rect(gap, gap, textAreaWidth, textAreaHeight), s);
+            
+            s = "Operators:\n";
+            foreach (Operator _operator in operators) {
+                s += _operator.formatString + "\n";
+            }
+            s += "\nInputs:\n";
+            foreach (InputValue inputValue in inputValues) {
+                s += inputValue.formatString + "\n";
+            }
+            GUI.skin.textArea.normal.background = null;
+            GUI.skin.textArea.normal.textColor = new Color(0f, 0f, 0f, 0.4f);
+            GUI.skin.textArea.alignment = TextAnchor.UpperRight;
+            GUI.TextArea(new Rect(Screen.width - 1 - gap - textAreaWidth, gap, textAreaWidth, textAreaHeight), s);
 
-        if (showCpuVersion) {
-            GUI.DrawTexture(new Rect(264f, 0f, 256f, 256f), cpuTexture);
+            if (showCpuVersion) {
+                GUI.DrawTexture(new Rect(264f, 0f, 256f, 256f), cpuTexture);
+            }
         }
     }
 
