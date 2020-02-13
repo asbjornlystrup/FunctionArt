@@ -7,16 +7,29 @@
 #define AND 4
 #define SUBTRACT 5
 #define CONSTANT 1000
-#define INPUT 1001
+#define INPUT_X 1001
+#define INPUT_Y 1002
+#define INPUT_CHANNEL 1003
+#define INPUT_TIME 1004
+#define INPUT_ANGLE 1005
+#define INPUT_LENGTH 1006
+#define INPUT_TEXTURE_RGB 1007
 
 RWTexture2D<float4> Texture;
+Texture2D<float4> InputTexture;
 
 StructuredBuffer<uint> ProgramBuffer;
-int ProgramBufferElementCount;
+int ProgramBufferElementCount;  
 int Time;
 
 [numthreads(8, 8, 1)]
 void Main (uint3 id : SV_DispatchThreadID) {
+    float2 centerToPos = id.xy - float2(128, 128);
+    uint ang = (uint)(atan2(centerToPos.y, centerToPos.x) / 6.28 * 256.0);
+    uint len = (uint)(length(centerToPos));
+
+    uint4 inputColor = (uint)(InputTexture[id.xy] * 255.0);
+
     float4 color = float4(0.0, 0.0, 0.0, 1.0);
     for (int c = 0; c < 3; c++) {
         int i = 0;
@@ -25,53 +38,31 @@ void Main (uint3 id : SV_DispatchThreadID) {
         while (i < ProgramBufferElementCount) {
             uint instructionId = ProgramBuffer[i];
             memoryIndex = ProgramBuffer[i + 1];
+            uint r;
             switch (instructionId) {
-                case XOR:
-                    memory[memoryIndex] = memory[ProgramBuffer[i + 2]] ^ memory[ProgramBuffer[i + 3]];
-                    i += 4;
-                    break;
-
-                case ADD:
-                    memory[memoryIndex] = memory[ProgramBuffer[i + 2]] + memory[ProgramBuffer[i + 3]];
-                    i += 4;
-                    break;
-
-                case MULTIPLY:
-                    memory[memoryIndex] = memory[ProgramBuffer[i + 2]] * memory[ProgramBuffer[i + 3]];
-                    i += 4;
-                    break;
-
-                case OR:
-                    memory[memoryIndex] = memory[ProgramBuffer[i + 2]] | memory[ProgramBuffer[i + 3]];
-                    i += 4;
-                    break;
-
-                case AND:
-                    memory[memoryIndex] = memory[ProgramBuffer[i + 2]] & memory[ProgramBuffer[i + 3]];
-                    i += 4;
-                    break;
-
-                case SUBTRACT:
-                    memory[memoryIndex] = memory[ProgramBuffer[i + 2]] - memory[ProgramBuffer[i + 3]];
-                    i += 4;
-                    break;
-                
-                case CONSTANT:
-                    memory[memoryIndex] = ProgramBuffer[i + 2];
-                    i += 3;
-                    break;
-
-                case INPUT:
-                    switch (ProgramBuffer[i + 2]) {
-                        case 0: memory[memoryIndex] = id.x; break;
-                        case 1: memory[memoryIndex] = id.y; break;
-                        case 2: memory[memoryIndex] = c; break;
-                        case 3: memory[memoryIndex] = (uint)Time; break;
-                        //case 2: memory[memoryIndex] = 
+                case XOR: r = memory[ProgramBuffer[i + 2]] ^ memory[ProgramBuffer[i + 3]]; i += 4; break;
+                case ADD: r = memory[ProgramBuffer[i + 2]] + memory[ProgramBuffer[i + 3]]; i += 4; break;
+                case MULTIPLY: r = memory[ProgramBuffer[i + 2]] * memory[ProgramBuffer[i + 3]]; i += 4; break;
+                case OR: r = memory[ProgramBuffer[i + 2]] | memory[ProgramBuffer[i + 3]]; i += 4; break;
+                case AND: r = memory[ProgramBuffer[i + 2]] & memory[ProgramBuffer[i + 3]]; i += 4; break;
+                case SUBTRACT: r = memory[ProgramBuffer[i + 2]] - memory[ProgramBuffer[i + 3]]; i += 4; break;
+                case CONSTANT: r = ProgramBuffer[i + 2]; i += 3; break;
+                case INPUT_X: r = id.x; i += 2; break;
+                case INPUT_Y: r = id.y; i += 2; break;
+                case INPUT_CHANNEL: r = c; i += 2; break;
+                case INPUT_TIME: r = (uint)Time; i += 2; break;
+                case INPUT_ANGLE: r = ang; i += 2; break;
+                case INPUT_LENGTH: r = len; i += 2; break;
+                case INPUT_TEXTURE_RGB:
+                    switch (c) {
+                        case 0: r = inputColor.r; break;
+                        case 1: r = inputColor.g; break;
+                        case 2: r = inputColor.b; break;
                     }
-                    i += 3;
+                    i += 2;
                     break;
             }
+            memory[memoryIndex] = r;
         }
 
         float result = float(memory[memoryIndex] % 256) / 255.0;

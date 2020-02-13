@@ -155,7 +155,8 @@ MonoBehaviour:
   threadGroups: {x: 0, y: 0, z: 0}
   textureSize: {x: 256, y: 256, z: 1}
   cpuTexture: {fileID: 0}
-  showCpuVersion: 0
+  inputTexture: {fileID: 2800000, guid: 696e8f74c79bde04e882d82d80cebff8, type: 3}
+  time: 0
 --- !u!20 &519420031
 Camera:
   m_ObjectHideFlags: 0
