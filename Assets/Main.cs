@@ -38,14 +38,14 @@ public class Main : MonoBehaviour {
     public Texture2D inputTexture;
     private bool showCpuVersion = false;
     private bool animate = true;
-    private bool videoMode = true;
+    private bool videoMode = false;
 
     private Texture2D cellBackgroundTexture;
     private uint nextOpenMemoryIndex = 0;
     private List<uint> programList = new List<uint>();
     private Generation[] generations;
     private int generationsX = 4;
-    private int generationsY = 3;
+    private int generationsY = 4;
 
     const uint XOR = 0;
     const uint ADD = 1;
@@ -69,6 +69,7 @@ public class Main : MonoBehaviour {
     const uint INPUT_LENGTH = 1006;
     const uint INPUT_TEXTURE_RGB = 1007;
 
+    public bool firstFrame = true;
     public int time = 0;
 
     private List<Operator> operators = new List<Operator>();
@@ -288,7 +289,8 @@ public class Main : MonoBehaviour {
     void Update() {
         bool updateTextures = false;
 
-        if (Input.GetKeyDown(KeyCode.Space) || Input.GetMouseButtonDown(0) || Input.GetMouseButtonDown(1)) {
+        if (firstFrame || Input.GetKeyDown(KeyCode.Space) || Input.GetMouseButtonDown(0) || Input.GetMouseButtonDown(1)) {
+            firstFrame = false;
             updateTextures = true;
             time = 0;
             for (int i = 0; i < generations.Length; i++) {
