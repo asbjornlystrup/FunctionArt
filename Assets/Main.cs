@@ -185,7 +185,7 @@ public class Main : MonoBehaviour {
             }
 
             // With distorted polar coordinates only. Lots of organic stuff.
-            if (false) {
+            if (true) { // 3: used this 4: used this with image
                 operators.Add(new Operator {type = XOR, inputCount = 2, formatString = "({0} ^ {1})"});
                 operators.Add(new Operator {type = ADD, inputCount = 2, formatString = "({0} + {1})"});
                 operators.Add(new Operator {type = MULTIPLY, inputCount = 2, formatString = "({0} * {1})"});
@@ -205,7 +205,7 @@ public class Main : MonoBehaviour {
             }
 
             // With distorted polar coordinates and other older input coordinates
-            if (true) {
+            if (false) { // 1: used this, 5: used this with image
                 operators.Add(new Operator {type = XOR, inputCount = 2, formatString = "({0} ^ {1})"});
                 operators.Add(new Operator {type = ADD, inputCount = 2, formatString = "({0} + {1})"});
                 operators.Add(new Operator {type = MULTIPLY, inputCount = 2, formatString = "({0} * {1})"});
@@ -298,7 +298,7 @@ public class Main : MonoBehaviour {
 
                 RenderTexture texture = generation.texture;
                 
-                Node rootNode = CreateAst(10);
+                Node rootNode = CreateAst(15); // 2: changed 10 to 15
                 generation.text = ComposeAstString(rootNode);
                 Debug.Log(generation.text);
 
